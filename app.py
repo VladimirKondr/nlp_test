@@ -1,3 +1,12 @@
+import subprocess
+import os
+
+# Run setup.py once before starting the app
+setup_file = os.path.join(os.getcwd(), 'setup.py')
+subprocess.run(['python', setup_file], check=True)
+import nltk
+nltk_data_dir = os.path.join(os.getcwd(), "nltk_data")
+nltk.data.path.append(nltk_data_dir)
 from flask import Flask, request, jsonify, render_template
 from include.FurnitureProductExtractor import FurnitureProductExtractor
 
