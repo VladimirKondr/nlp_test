@@ -1,0 +1,8 @@
+.venv/
+.vscode/
+include/__pycache__/
+test/
+.pytest_cache/
+nltk_data/
+*.log
+.DS_Store

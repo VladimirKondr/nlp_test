@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Furniture Product Extractor</title>
+    <script>
+        async function extractProducts() {
+            const url = document.getElementById('urlInput').value;
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Loading...';
+
+            try {
+                const response = await fetch('/extract', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ url })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    resultDiv.innerHTML = '<h3>Extracted Products:</h3>' +
+                        '<ul>' + data.products.map(name => `<li>${name}</li>`).join('') + '</ul>';
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Furniture Product Extractor</h1>
+    <p>Enter a URL to extract product names:</p>
+    <input type="text" id="urlInput" placeholder="Enter URL here" style="width: 300px;">
+    <button onclick="extractProducts()">Extract</button>
+    <div id="result" style="margin-top: 20px;"></div>
+</body>
+</html>
