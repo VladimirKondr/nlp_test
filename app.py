@@ -26,11 +26,9 @@ def extract():
 
     try:
         products = extractor.process_url(url, True)
-        if products and products[0].get("bad request"):
+        if len(products) == 1 and type(products[0]) == "dict" and products[0].get("bad request"):
             return jsonify({"error": "Failed to fetch the URL"}), 400
-
-        product_names = [product.get('name', '') for product in products]
-        return jsonify({"products": product_names})
+        return jsonify({"products": products})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
