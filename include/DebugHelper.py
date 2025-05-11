@@ -10,7 +10,7 @@ class DebugMode(Enum):
 
 GLOBAL_DEBUG_MODE = DebugMode.FILE
 GLOBAL_DEBUG_FILENAME = "debug.log"
-GLOBAL_DEBUG_FILEMODE = 'a'
+GLOBAL_DEBUG_FILEMODE = 'w'
 try:
     # Use absolute path to ensure consistent file location
     GLOBAL_DEBUG_FILEPATH = os.path.join(os.getcwd(), GLOBAL_DEBUG_FILENAME)
@@ -22,6 +22,11 @@ except Exception as e:
 
 
 class DebugHelper:
+    """
+    A utility class for logging debug information and measuring execution time.
+    Implements a singleton pattern to ensure a single instance.
+    """
+
     _instance = None
 
     def __new__(cls):
@@ -30,62 +35,60 @@ class DebugHelper:
         return cls._instance
 
     def __init__(self):
-        # Only initialize if not already done
         if not hasattr(self, '_initialized'):
             self._initialized = True
+            self.debug_file = None  # Ensure debug_file is always initialized
+            self._setup_debug_file()
 
-    @classmethod
-    def get_instance(cls):
-        """Get the singleton instance, creating it if necessary."""
-        if cls._instance is None:
-            cls._instance = cls()
-        return cls._instance
+    def _setup_debug_file(self):
+        """Sets up the debug file if required by the global debug mode."""
+        if GLOBAL_DEBUG_MODE in (DebugMode.FILE, DebugMode.FILE_AND_STDOUT):
+            try:
+                self.debug_file = open(GLOBAL_DEBUG_FILEPATH, GLOBAL_DEBUG_FILEMODE)
+            except Exception as e:
+                print(f"Error opening debug file: {e}")
+                self.debug_file = None
 
-    def log1(self, message: str, name: str):
-        """Log a message to file, stdout, or both based on debug mode."""
+    def log(self, message: str, name: str = ""):
+        """Logs a message based on the current debug mode."""
         if GLOBAL_DEBUG_MODE == DebugMode.OFF:
             return
-            
-        # Fix the string formatting with escaped quotes
+
         timestamp = time.strftime("%H:%M")
         formatted_message = f"({timestamp})[{name}] {message}"
-        
-        if GLOBAL_DEBUG_MODE in (DebugMode.FILE, DebugMode.FILE_AND_STDOUT) and GLOBAL_DEBUG_FILE:
+
+        if self.debug_file:
             try:
-                GLOBAL_DEBUG_FILE.write(formatted_message + "\n")
-                GLOBAL_DEBUG_FILE.flush()
+                self.debug_file.write(formatted_message + "\n")
+                self.debug_file.flush()
             except Exception as e:
                 print(f"Error writing to log file: {e}")
-                
+
         if GLOBAL_DEBUG_MODE in (DebugMode.STDOUT, DebugMode.FILE_AND_STDOUT):
             print(formatted_message)
 
-    @staticmethod
-    def log(message: str, name: str = ""):
-        """Static wrapper for logging via the singleton instance."""
-        DebugHelper.get_instance().log1(message, name)
-
     def close(self):
-        """Close the log file if open."""
-        if GLOBAL_DEBUG_FILE:
-            GLOBAL_DEBUG_FILE.close()
+        """Closes the debug file if it is open."""
+        if self.debug_file:
+            self.debug_file.close()
 
     @staticmethod
-    def close_static():
-        """Static wrapper for closing via the singleton instance."""
-        DebugHelper.get_instance().close()
+    def time_func():
+        """Decorator to measure and log execution time of functions."""
+        def decorator(func):
+            def wrapper(*args, **kwargs):
+                if GLOBAL_DEBUG_MODE == DebugMode.OFF:
+                    return func(*args, **kwargs)
 
-def time_func():
-    """Decorator to measure and log execution time of sync or async functions, only when debug is enabled."""
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            if GLOBAL_DEBUG_MODE == DebugMode.OFF:
-                return func(*args, **kwargs)
-            start_time = time.time()
-            result = func(*args, **kwargs)
-            end_time = time.time()
-            elapsed_time = end_time - start_time
-            DebugHelper.log(f"Function '{func.__qualname__}' took {elapsed_time:.2f} seconds")
-            return result
-        return wrapper
-    return decorator
+                start_time = time.time()
+                result = func(*args, **kwargs)
+                elapsed_time = time.time() - start_time
+                DebugHelper().log(f"Function '{func.__qualname__}' took {elapsed_time:.2f} seconds")
+                return result
+
+            return wrapper
+
+        return decorator
+
+# Ensure the singleton instance is initialized
+DebugHelper()
