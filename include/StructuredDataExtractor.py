@@ -36,7 +36,6 @@ class StructuredDataExtractor:
                 name = product.find(itemprop="name")
                 structured_data.append(self.product_helper.get_property_value(name))
         except Exception as e:
-            # Log the error but continue processing
             DebugHelper().log(f"Error extracting microdata product data: {str(e)}", self.__class__.__qualname__)
             return
             
@@ -44,25 +43,20 @@ class StructuredDataExtractor:
     def extract_structured_product_data_rdfa(self, soup, structured_data):
         """Extract product data from RDFa markup."""
         try:
-            # Find all elements with typeof attribute that could represent products
             rdfa_candidates = soup.find_all(attrs={"typeof": True})
             
-            # Filter only top-level Product elements
             product_candidates = []
             for candidate in rdfa_candidates:
                 if "Product" in candidate.get("typeof", ""):
-                    # Check if this is a top-level product (not nested in another product)
                     if not any(parent.has_attr("typeof") and "Product" in parent.get("typeof", "") 
                             for parent in candidate.parents):
                         product_candidates.append(candidate)
             
             for product in product_candidates:
-                # Extract direct properties from the product element
                 name_elem = product.find(attrs={"property": "name"})
                 structured_data.append(self.product_helper.get_property_value(name_elem))
                     
         except Exception as e:
-            # Log the error but continue processing
             DebugHelper().log(f"Error extracting RDFa product data: {str(e)}", self.__class__.__qualname__)
 
 
@@ -72,14 +66,11 @@ class StructuredDataExtractor:
 
         DebugHelper().log("Extracting all structured data", self.__class__.__qualname__)
         structured_data = []
-        
-        # Look for JSON-LD markup
+
         self.extract_structured_product_data_json_ld(soup, structured_data)
-                
-        # Check for microdata schema.org product markup
+
         self.extract_structured_product_data_microdata(soup, structured_data)
-        
-        # Find elements with RDFa product markup
+
         self.extract_structured_product_data_rdfa(soup, structured_data)
 
         return structured_data

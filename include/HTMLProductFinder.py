@@ -20,10 +20,8 @@ class HTMLProductFinder:
     def find_products_dumb(self, soup):
         result = []
 
-        # Use the provided filter criteria to find elements
         elements = soup.find_all(self.filter_criteria)
 
-        # Extract and validate text
         for element in elements:
             text = element.get_text(strip=True)
             if self.validator.is_valid_product_name(text, element):

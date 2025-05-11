@@ -93,10 +93,8 @@ class ProductHelper:
         if not products:
             return []
         
-        # Remove empty
         products = [p for p in products if p]
 
-        # Remove duplicates
         unique_products = self.remove_duplicates(products)
 
         return unique_products

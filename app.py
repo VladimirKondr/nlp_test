@@ -1,7 +1,6 @@
 import subprocess
 import os
 
-# Run setup.py once before starting the app
 setup_file = os.path.join(os.getcwd(), 'setup.py')
 subprocess.run(['python', setup_file], check=True)
 import nltk

@@ -12,7 +12,6 @@ GLOBAL_DEBUG_MODE = DebugMode.FILE
 GLOBAL_DEBUG_FILENAME = "debug.log"
 GLOBAL_DEBUG_FILEMODE = 'w'
 try:
-    # Use absolute path to ensure consistent file location
     GLOBAL_DEBUG_FILEPATH = os.path.join(os.getcwd(), GLOBAL_DEBUG_FILENAME)
     GLOBAL_DEBUG_FILE = open(GLOBAL_DEBUG_FILEPATH, GLOBAL_DEBUG_FILEMODE) if GLOBAL_DEBUG_MODE in (DebugMode.FILE, DebugMode.FILE_AND_STDOUT) else None
     print(f"Debug log file opened at: {GLOBAL_DEBUG_FILEPATH}")
@@ -37,7 +36,7 @@ class DebugHelper:
     def __init__(self):
         if not hasattr(self, '_initialized'):
             self._initialized = True
-            self.debug_file = None  # Ensure debug_file is always initialized
+            self.debug_file = None
             self._setup_debug_file()
 
     def _setup_debug_file(self):
@@ -90,5 +89,4 @@ class DebugHelper:
 
         return decorator
 
-# Ensure the singleton instance is initialized
 DebugHelper()
