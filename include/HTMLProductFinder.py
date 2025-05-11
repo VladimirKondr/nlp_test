@@ -2,12 +2,11 @@ from include.DebugHelper import DebugHelper
 
 
 class HTMLProductFinder:
-    def __init__(self, nlp_model, validator, structured_product_helper, filter_criteria=None):
+    def __init__(self, nlp_model, validator, filter_criteria=None):
         """Initialize with NLP models, validator, text processor, and optional filter criteria."""
         DebugHelper().log("Initializing HTMLProductFinder", self.__class__.__qualname__)
         self.nlp_model = nlp_model
         self.validator = validator
-        self.structured_product_helper = structured_product_helper
         self.filter_criteria = filter_criteria or self.default_filter_criteria
 
     def default_filter_criteria(self, tag):
@@ -28,7 +27,7 @@ class HTMLProductFinder:
         for element in elements:
             text = element.get_text(strip=True)
             if self.validator.is_valid_product_name(text, element):
-                result.append({"name": text})
+                result.append(text)
 
         return result
 

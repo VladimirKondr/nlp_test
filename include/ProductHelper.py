@@ -4,7 +4,7 @@ import re
 from typing import Any, Dict, List
 
 
-class StructuredProductHelper:
+class ProductHelper:
     def __init__(self, nlp_model=None, validator=None, similarity_threshold=0.8, normalization_rules=None):
         """
         Initialize helper for processing product dictionaries.
@@ -55,13 +55,13 @@ class StructuredProductHelper:
         """Calculate similarity between two strings."""
         return SequenceMatcher(None, text1, text2).ratio()
 
-    def are_duplicates(self, product1: Dict[str, Any], product2: Dict[str, Any]) -> bool:
+    def are_duplicates(self, product1: str, product2: str) -> bool:
         """Determine if two products are duplicates."""
-        if not product1.get('name') or not product2.get('name'):
+        if not product1 or not product2:
             return False
 
-        name1 = self.normalize_name(product1['name'])
-        name2 = self.normalize_name(product2['name'])
+        name1 = self.normalize_name(product1)
+        name2 = self.normalize_name(product2)
 
         if name1 == name2:
             return True
@@ -74,58 +74,29 @@ class StructuredProductHelper:
             return True
 
         return False
+    
+    def remove_duplicates(self, products: List[str]) -> List[str]:
+        """Remove duplicate product names from a list."""
+        unique_products = []
+        seen = set()
 
-    def merge_products(self, products: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Merge duplicate products, retaining the most complete information."""
+        for product in products:
+            normalized_name = self.normalize_name(product)
+            if normalized_name not in seen:
+                seen.add(normalized_name)
+                unique_products.append(product)
+
+        return unique_products
+
+    def process(self, products: List[str]) -> List[str]:
+        """Process a list of product names, removing duplicates and normalizing."""
         if not products:
             return []
+        
+        # Remove empty
+        products = [p for p in products if p]
 
-        groups = []
-        for product in products:
-            found_group = False
-            for group in groups:
-                if any(self.are_duplicates(product, item) for item in group):
-                    group.append(product)
-                    found_group = True
-                    break
+        # Remove duplicates
+        unique_products = self.remove_duplicates(products)
 
-            if not found_group:
-                groups.append([product])
-
-        return [self.select_best_product(group) for group in groups]
-
-    def select_best_product(self, products: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Select the best product from a group of duplicates."""
-        if not products:
-            return {}
-        if len(products) == 1:
-            return products[0]
-
-        sorted_products = sorted(products, key=lambda p: p.get('confidence', 0), reverse=True)
-        best_product = sorted_products[0].copy()
-
-        for product in sorted_products[1:]:
-            for key, value in product.items():
-                if key not in best_product and value:
-                    best_product[key] = value
-        return best_product
-
-    def process_structured_data(self, products: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """
-        Return a list of the best unique products.
-
-        Args:
-            products: List of dictionaries with product information.
-
-        Returns:
-            List of unique products with the best information.
-        """
-        filtered_products = self._filter_valid_products(products)
-        return self.merge_products(filtered_products)
-
-    def _filter_valid_products(self, products: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Filter products to include only valid ones."""
-        filtered = [p for p in products if p.get('name')]
-        if self.validator:
-            filtered = [p for p in filtered if self.validator.is_valid_product_name(p.get('name', ''))]
-        return filtered
+        return unique_products

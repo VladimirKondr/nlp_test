@@ -10,7 +10,7 @@ class DebugMode(Enum):
 
 GLOBAL_DEBUG_MODE = DebugMode.FILE
 GLOBAL_DEBUG_FILENAME = "debug.log"
-GLOBAL_DEBUG_FILEMODE = 'a'
+GLOBAL_DEBUG_FILEMODE = 'w'
 try:
     # Use absolute path to ensure consistent file location
     GLOBAL_DEBUG_FILEPATH = os.path.join(os.getcwd(), GLOBAL_DEBUG_FILENAME)
