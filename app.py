@@ -6,14 +6,7 @@ nltk_data_dir = os.path.join(os.getcwd(), "nltk_data")
 nltk.data.path.append(nltk_data_dir)
 from flask import Flask, request, jsonify, render_template
 from include.FurnitureProductExtractor import FurnitureProductExtractor
-import spacy
-spacy_model_name = "en_core_web_md"
-try:
-    spacy.load(spacy_model_name)
-    print(f"spaCy model '{spacy_model_name}' уже установлен")
-except OSError:
-    print(f"Установка spaCy модели '{spacy_model_name}'...")
-    os.system(f"python -m spacy download {spacy_model_name}")
+
 app = Flask(__name__)
 extractor = FurnitureProductExtractor()
 
