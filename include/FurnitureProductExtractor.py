@@ -2,18 +2,24 @@ from include.DebugHelper import DebugHelper
 from include.HTMLFetcher import HTMLFetcher
 from include.HTMLProductFinder import HTMLProductFinder
 from include.NLPModel import NLPModel
-from include.ProductValidator import ProductValidator
+from include.FurnitureProductValidator import FurnitureProductValidator
 from include.StructuredDataExtractor import StructuredDataExtractor
 from include.ProductHelper import ProductHelper
 
 class FurnitureProductExtractor:
-    def __init__(self, html_fetcher=None, product_finder=None, data_extractor=None):
+    def __init__(self,
+            html_fetcher=None,
+            nlp_model=None,
+            product_validator=None,
+            product_helper=None,
+            product_finder=None,
+            data_extractor=None):
         """Initialize the furniture product extractor with modular components."""
         DebugHelper().log("Initializing FurnitureProductExtractor", self.__class__.__qualname__)
         self.html_fetcher = html_fetcher if html_fetcher else HTMLFetcher(timeout=3)
-        nlp_model = NLPModel()
-        validator = ProductValidator(nlp_model)
-        self.product_helper = ProductHelper(nlp_model, validator)
+        nlp_model = nlp_model if nlp_model else NLPModel()
+        validator = product_validator if product_validator else FurnitureProductValidator(nlp_model)
+        self.product_helper = product_helper if product_helper else ProductHelper(nlp_model, validator)
         self.product_finder = product_finder if product_finder else HTMLProductFinder(nlp_model, validator, self.product_helper)
         self.data_extractor = data_extractor if data_extractor else StructuredDataExtractor(self.product_helper)
 

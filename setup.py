@@ -17,7 +17,7 @@ nltk_data_dir = os.path.join(os.getcwd(), "nltk_data")
 corpora_dir = os.path.join(nltk_data_dir, "corpora")
 wordnet_dir = os.path.join(corpora_dir, "wordnet")
 omw_dir = os.path.join(corpora_dir, "omw-1.4")
-spacy_model_name = "en_core_web_sm"
+spacy_model_name = "en_core_web_md"
 
 os.makedirs(corpora_dir, exist_ok=True)
 

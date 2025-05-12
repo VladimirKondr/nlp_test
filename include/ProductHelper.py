@@ -2,6 +2,8 @@ from difflib import SequenceMatcher
 from functools import lru_cache
 import re
 from typing import Any, Dict, List
+from include.NLPModel import NLPModel
+from include.ProductValidator import ProductValidator
 
 
 class ProductHelper:
@@ -15,8 +17,8 @@ class ProductHelper:
             similarity_threshold: Threshold for determining duplicates.
             normalization_rules: Configurable rules for name normalization.
         """
-        self.nlp_model = nlp_model
-        self.validator = validator
+        self.nlp_model = nlp_model if nlp_model else NLPModel()
+        self.validator = validator if validator else ProductValidator(self.nlp_model)
         self.similarity_threshold = similarity_threshold
         self.normalization_rules = normalization_rules or self.default_normalization_rules()
 

@@ -1,12 +1,13 @@
 from include.DebugHelper import DebugHelper
-
+from include.NLPModel import NLPModel
+from include.ProductValidator import ProductValidator
 
 class HTMLProductFinder:
-    def __init__(self, nlp_model, validator, filter_criteria=None):
+    def __init__(self, nlp_model=None, validator=None, filter_criteria=None):
         """Initialize with NLP models, validator, text processor, and optional filter criteria."""
         DebugHelper().log("Initializing HTMLProductFinder", self.__class__.__qualname__)
-        self.nlp_model = nlp_model
-        self.validator = validator
+        self.nlp_model = nlp_model if nlp_model else NLpModel()
+        self.validator = validator if validator else ProductValidator(self.nlp_model)
         self.filter_criteria = filter_criteria or self.default_filter_criteria
 
     def default_filter_criteria(self, tag):

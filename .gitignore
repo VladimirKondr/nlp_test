@@ -7,3 +7,4 @@ nltk_data/
 test_env/
 *.log
 .DS_Store
+second_solution/

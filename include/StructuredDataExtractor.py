@@ -1,12 +1,13 @@
 import json
 import re
 from include.DebugHelper import DebugHelper
+from include.ProductHelper import ProductHelper
 
 
 class StructuredDataExtractor:
     def __init__(self, product_helper):
         DebugHelper().log("Initializing StructuredDataExtractor", self.__class__.__qualname__)
-        self.product_helper = product_helper
+        self.product_helper = product_helper if product_helper else ProductHelper()
     
     def extract_structured_product_data_json_ld(self, soup, structured_data):
         """Extract structured product data from JSON-LD, including currency."""

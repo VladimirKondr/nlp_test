@@ -6,7 +6,7 @@ from nltk.corpus import wordnet as wn
 class NLPModel:
     def __init__(self):
         try:
-            self.model = spacy.load("en_core_web_sm")
+            self.model = spacy.load("en_core_web_md")
         except Exception as e:
             raise RuntimeError(f"Error loading SpaCy model: {e}")
 
