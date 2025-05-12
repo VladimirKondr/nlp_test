@@ -8,7 +8,7 @@ class DebugMode(Enum):
     STDOUT = 2
     FILE_AND_STDOUT = 3
 
-GLOBAL_DEBUG_MODE = DebugMode.FILE
+GLOBAL_DEBUG_MODE = DebugMode.FILE_AND_STDOUT
 GLOBAL_DEBUG_FILENAME = "debug.log"
 GLOBAL_DEBUG_FILEMODE = 'w'
 try:
