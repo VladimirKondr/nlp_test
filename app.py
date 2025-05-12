@@ -1,14 +1,19 @@
 import subprocess
 import os
 
-setup_file = os.path.join(os.getcwd(), 'setup.py')
-subprocess.run(['python', setup_file], check=True)
 import nltk
 nltk_data_dir = os.path.join(os.getcwd(), "nltk_data")
 nltk.data.path.append(nltk_data_dir)
 from flask import Flask, request, jsonify, render_template
 from include.FurnitureProductExtractor import FurnitureProductExtractor
-
+import spacy
+spacy_model_name = "en_core_web_md"
+try:
+    spacy.load(spacy_model_name)
+    print(f"spaCy model '{spacy_model_name}' уже установлен")
+except OSError:
+    print(f"Установка spaCy модели '{spacy_model_name}'...")
+    os.system(f"python -m spacy download {spacy_model_name}")
 app = Flask(__name__)
 extractor = FurnitureProductExtractor()
 
@@ -34,3 +39,5 @@ def extract():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
+
+    
